@@ -6,9 +6,10 @@ using Microsoft.AspNet.Identity.Test;
 using Microsoft.AspNet.PipelineCore;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Data.Entity;
 using Xunit;
 
-namespace Microsoft.AspNet.Identity.InMemory.Test
+namespace Microsoft.AspNet.Identity.Entity.Test
 {
     public class StartupTest
     {
@@ -76,16 +77,21 @@ namespace Microsoft.AspNet.Identity.InMemory.Test
             //builder.UseServices(services => services.AddIdentity<ApplicationUser>(s =>
             //    s.AddEntity<ApplicationDbContext>()
             //{
-                
-            builder.UseServices(services => services.AddIdentity<ApplicationUser, EntityRole>(s =>
+
+            builder.UseServices(services =>
             {
-                s.AddEntity();
-                s.AddUserManager<ApplicationUserManager>();
-                s.AddRoleManager<ApplicationRoleManager>();
-            }));
+                services.AddEntityFramework();
+                services.AddTransient<DbContext, IdentityContext>();
+                services.AddIdentity<ApplicationUser, EntityRole>(s =>
+                {
+                    s.AddEntity();
+                    s.AddUserManager<ApplicationUserManager>();
+                    s.AddRoleManager<ApplicationRoleManager>();
+                });
+            });
 
             var userStore = builder.ApplicationServices.GetService<IUserStore<ApplicationUser>>();
-            var roleStore = builder.ApplicationServices.GetService<IRoleStore<IdentityRole>>();
+            var roleStore = builder.ApplicationServices.GetService<IRoleStore<EntityRole>>();
             var userManager = builder.ApplicationServices.GetService<ApplicationUserManager>();
             //TODO: var userManager = builder.ApplicationServices.GetService<UserManager<IdentityUser>();
             var roleManager = builder.ApplicationServices.GetService<ApplicationRoleManager>();
@@ -95,7 +101,7 @@ namespace Microsoft.AspNet.Identity.InMemory.Test
             Assert.NotNull(roleStore);
             Assert.NotNull(roleManager);
 
-            await CreateAdminUser(builder.ApplicationServices);
+            //await CreateAdminUser(builder.ApplicationServices);
         }
 
         private static async Task CreateAdminUser(IServiceProvider serviceProvider)

@@ -87,13 +87,13 @@ namespace Microsoft.AspNet.Identity.Test
 
             var dic = new Dictionary<string, string>
             { 
-                {"identity:claimtype:role", roleClaimType},
-                {"identity:claimtype:username", usernameClaimType},
-                {"identity:claimtype:userid", useridClaimType},
-                {"identity:claimtype:securitystamp", securityStampClaimType}
+                {"role", roleClaimType},
+                {"username", usernameClaimType},
+                {"userid", useridClaimType},
+                {"securitystamp", securityStampClaimType}
             };
             var config = new ConfigurationModel.Configuration {new MemoryConfigurationSource(dic)};
-            Assert.Equal(roleClaimType, config.Get("identity:claimtype:role"));
+            Assert.Equal(roleClaimType, config.Get("role"));
             var options = new ClaimTypeOptions(config);
             Assert.Equal(roleClaimType, options.Role);
             Assert.Equal(useridClaimType, options.UserId);
@@ -106,11 +106,11 @@ namespace Microsoft.AspNet.Identity.Test
         {
             var dic = new Dictionary<string, string>
             { 
-                {"identity:password:RequiredLength", "10"},
-                {"identity:password:RequireNonLetterOrDigit", "false"},
-                {"identity:password:RequireUpperCase", "false"},
-                {"identity:password:RequireDigit", "false"},
-                {"identity:password:RequireLowerCase", "false"}
+                {"RequiredLength", "10"},
+                {"RequireNonLetterOrDigit", "false"},
+                {"RequireUpperCase", "false"},
+                {"RequireDigit", "false"},
+                {"RequireLowerCase", "false"}
             };
             var config = new ConfigurationModel.Configuration { new MemoryConfigurationSource(dic) };
             var options = new PasswordOptions(config);

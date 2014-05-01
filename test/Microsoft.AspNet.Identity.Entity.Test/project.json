@@ -11,6 +11,7 @@
     "Microsoft.AspNet.RequestContainer": "0.1-alpha-*",
     "Microsoft.AspNet.Security.DataProtection": "0.1-alpha-*",
     "Microsoft.AspNet.Testing": "0.1-alpha-*",
+    "Microsoft.Bcl.Immutable": "1.1.18-beta-*",
     "Microsoft.Data.Entity": "0.1-alpha-*",
     "Microsoft.Data.InMemory": "0.1-alpha-*",
     "Microsoft.Data.Migrations": "0.1-alpha-*",
