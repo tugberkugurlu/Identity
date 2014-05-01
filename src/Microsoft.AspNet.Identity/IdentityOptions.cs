@@ -30,7 +30,7 @@ namespace Microsoft.AspNet.Identity
         public static void Read(object obj, IConfiguration config)
         {
             var type = obj.GetType();
-            var props = type.GetProperties();
+            var props = type.GetTypeInfo().DeclaredProperties;
             foreach (var prop in props)
             {
                 // TODO: handle non string types?
