@@ -40,6 +40,38 @@ namespace Microsoft.AspNet.Identity
             return AddInstance(func);
         }
 
+        public class OptionsSetup<TOptions> : IOptionsSetup<TOptions>
+        {
+            public Action<TOptions> SetupAction { get; private set; }
+
+            public OptionsSetup(Action<TOptions> setupAction)
+            {
+                if (setupAction == null)
+                {
+                    throw new ArgumentNullException("setupAction");
+                }
+                SetupAction = setupAction;
+            }
+
+            public void Setup(TOptions options)
+            {
+                SetupAction(options);
+            }
+
+            public int Order { get; set; }
+        }
+
+        public IdentityBuilder<TUser, TRole> SetupOptions(Action<IdentityOptions> action, int order)
+        {
+            Services.AddSetup(new OptionsSetup<IdentityOptions>(action) {Order = order});
+            return this;
+        }
+
+        public IdentityBuilder<TUser, TRole> SetupOptions(Action<IdentityOptions> action)
+        {
+            return SetupOptions(action, 0);
+        }
+
         public IdentityBuilder<TUser, TRole> AddUserManager<TManager>() where TManager : UserManager<TUser>
         {
             Services.AddScoped<TManager>();

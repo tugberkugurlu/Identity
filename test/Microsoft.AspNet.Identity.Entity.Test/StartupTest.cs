@@ -1,6 +1,7 @@
 using Microsoft.AspNet.Abstractions;
 using Microsoft.AspNet.DependencyInjection;
 using Microsoft.AspNet.DependencyInjection.Fallback;
+using Microsoft.AspNet.Identity.Entity;
 using Microsoft.AspNet.Identity.Test;
 using Microsoft.AspNet.PipelineCore;
 using System;
@@ -11,12 +12,16 @@ namespace Microsoft.AspNet.Identity.InMemory.Test
 {
     public class StartupTest
     {
-        public class ApplicationUser : IdentityUser { }
-
+        public class ApplicationUser : EntityUser { }
         public class ApplicationUserManager : UserManager<ApplicationUser>
         {
             public ApplicationUserManager(IServiceProvider services, IUserStore<ApplicationUser> store, IOptionsAccessor<IdentityOptions> options) : base(services, store, options) { }
         }
+        public class ApplicationRoleManager : RoleManager<EntityRole>
+        {
+            public ApplicationRoleManager(IServiceProvider services, IRoleStore<EntityRole> store) : base(services, store) { }
+        }
+
 
         public class PasswordsNegativeLengthSetup : IOptionsSetup<IdentityOptions>
         {
@@ -72,9 +77,9 @@ namespace Microsoft.AspNet.Identity.InMemory.Test
             //    s.AddEntity<ApplicationDbContext>()
             //{
                 
-            builder.UseServices(services => services.AddIdentity<ApplicationUser>(s =>
+            builder.UseServices(services => services.AddIdentity<ApplicationUser, EntityRole>(s =>
             {
-                s.AddInMemory();
+                s.AddEntity();
                 s.AddUserManager<ApplicationUserManager>();
                 s.AddRoleManager<ApplicationRoleManager>();
             }));
@@ -103,7 +108,7 @@ namespace Microsoft.AspNet.Identity.InMemory.Test
 
             var user = new ApplicationUser { UserName = userName };
             IdentityResultAssert.IsSuccess(await userManager.CreateAsync(user, password));
-            IdentityResultAssert.IsSuccess(await roleManager.CreateAsync(new IdentityRole { Name = roleName }));
+            IdentityResultAssert.IsSuccess(await roleManager.CreateAsync(new EntityRole { Name = roleName }));
             IdentityResultAssert.IsSuccess(await userManager.AddToRoleAsync(user, roleName));
         }
     }

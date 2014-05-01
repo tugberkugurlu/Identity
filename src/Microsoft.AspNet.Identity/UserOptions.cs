@@ -1,3 +1,5 @@
+using Microsoft.AspNet.ConfigurationModel;
+
 namespace Microsoft.AspNet.Identity
 {
     public class UserOptions
@@ -6,6 +8,11 @@ namespace Microsoft.AspNet.Identity
         {
             AllowOnlyAlphanumericNames = true;
             //User.RequireUniqueEmail = true; // TODO: app decision?
+        }
+
+        public UserOptions(IConfiguration config) : this()
+        {
+            IdentityOptions.Read(this, config);
         }
 
         /// <summary>

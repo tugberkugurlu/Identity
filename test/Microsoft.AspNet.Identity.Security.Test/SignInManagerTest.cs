@@ -2,8 +2,14 @@ using System;
 using System.Threading;
 using Microsoft.AspNet.Abstractions;
 using Microsoft.AspNet.Abstractions.Security;
+using Microsoft.AspNet.DependencyInjection.Fallback;
+using Microsoft.AspNet.Identity.InMemory;
 using Microsoft.AspNet.Identity.Test;
 using Microsoft.AspNet.DependencyInjection;
+using Microsoft.AspNet.Logging;
+using Microsoft.AspNet.PipelineCore;
+using Microsoft.AspNet.FeatureModel;
+using Microsoft.AspNet.Security.Cookies;
 using Moq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,8 +19,102 @@ namespace Microsoft.AspNet.Identity.Security.Test
 {
     public class SignInManagerTest
     {
-
 #if NET45
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task VerifyAccountControllerSignIn(bool isPersistent)
+        {
+            IBuilder app = new Builder(new ServiceCollection().BuildServiceProvider());
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie
+            });
+
+            var context = new Mock<HttpContext>();
+            var response = new Mock<HttpResponse>();
+            context.Setup(c => c.Response).Returns(response.Object).Verifiable();
+            response.Setup(r => r.SignIn(It.IsAny<ClaimsIdentity>(), It.Is<AuthenticationProperties>(v => v.IsPersistent == isPersistent))).Verifiable();
+            var contextAccessor = new Mock<IContextAccessor<HttpContext>>();
+            contextAccessor.Setup(a => a.Value).Returns(context.Object);
+            app.UseServices(services =>
+            {
+                services.AddInstance(contextAccessor.Object);
+                services.AddInstance<ILoggerFactory>(new NullLoggerFactory());
+                services.AddIdentity<ApplicationUser, IdentityRole>(s =>
+                {
+                    s.AddInMemory();
+                    s.AddUserManager<ApplicationUserManager>();
+                    s.AddRoleManager<ApplicationRoleManager>();
+                });
+                services.AddTransient<ApplicationSignInManager>();
+            });
+
+            // Act
+            var user = new ApplicationUser
+            {
+                UserName = "Yolo"
+            };
+            const string password = "Yol0Sw@g!";
+            var userManager = app.ApplicationServices.GetService<ApplicationUserManager>();
+            var signInManager = app.ApplicationServices.GetService<ApplicationSignInManager>();
+
+            IdentityResultAssert.IsSuccess(await userManager.CreateAsync(user, password));
+            var result = await signInManager.PasswordSignInAsync(user.UserName, password, isPersistent, false);
+
+            // Assert
+            Assert.Equal(SignInStatus.Success, result);
+            context.VerifyAll();
+            response.VerifyAll();
+            contextAccessor.VerifyAll();
+        }
+
+        //[Theory]
+        //[InlineData(true)]
+        //[InlineData(false)]
+        //public async Task VerifyAccountControllerSignInFunctional(bool isPersistent)
+        //{
+        //    IBuilder app = new Builder(new ServiceCollection().BuildServiceProvider());
+        //    app.UseCookieAuthentication(new CookieAuthenticationOptions
+        //    {
+        //        AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie
+        //    });
+
+        // TODO: how to functionally test context?
+        //    var context = new DefaultHttpContext(new FeatureCollection());
+        //    var contextAccessor = new Mock<IContextAccessor<HttpContext>>();
+        //    contextAccessor.Setup(a => a.Value).Returns(context);
+        //    app.UseServices(services =>
+        //    {
+        //        services.AddInstance(contextAccessor.Object);
+        //        services.AddInstance<ILoggerFactory>(new NullLoggerFactory());
+        //        services.AddIdentity<ApplicationUser, IdentityRole>(s =>
+        //        {
+        //            s.AddUserStore(() => new InMemoryUserStore<ApplicationUser>());
+        //            s.AddUserManager<ApplicationUserManager>();
+        //            s.AddRoleStore(() => new InMemoryRoleStore<IdentityRole>());
+        //            s.AddRoleManager<ApplicationRoleManager>();
+        //        });
+        //        services.AddTransient<ApplicationSignInManager>();
+        //    });
+
+        //    // Act
+        //    var user = new ApplicationUser
+        //    {
+        //        UserName = "Yolo"
+        //    };
+        //    const string password = "Yol0Sw@g!";
+        //    var userManager = app.ApplicationServices.GetService<ApplicationUserManager>();
+        //    var signInManager = app.ApplicationServices.GetService<ApplicationSignInManager>();
+
+        //    IdentityResultAssert.IsSuccess(await userManager.CreateAsync(user, password));
+        //    var result = await signInManager.PasswordSignInAsync(user.UserName, password, isPersistent, false);
+
+        //    // Assert
+        //    Assert.Equal(SignInStatus.Success, result);
+        //    contextAccessor.VerifyAll();
+        //}
+
         [Fact]
         public void ConstructorNullChecks()
         {
@@ -51,6 +151,9 @@ namespace Microsoft.AspNet.Identity.Security.Test
 
             // Assert
             identityFactory.VerifyAll();
+            context.VerifyAll();
+            contextAccessor.VerifyAll();
+            response.VerifyAll();
         }
 
         [Fact]
@@ -73,7 +176,7 @@ namespace Microsoft.AspNet.Identity.Security.Test
             Assert.Equal(SignInStatus.LockedOut, result);
             manager.VerifyAll();
         }
-
+            
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -100,6 +203,9 @@ namespace Microsoft.AspNet.Identity.Security.Test
             // Assert
             Assert.Equal(SignInStatus.Success, result);
             manager.VerifyAll();
+            context.VerifyAll();
+            response.VerifyAll();
+            contextAccessor.VerifyAll();
         }
 
         [Theory]
@@ -197,5 +303,30 @@ namespace Microsoft.AspNet.Identity.Security.Test
             manager.VerifyAll();
         }
 #endif
+        public class ApplicationSignInManager : SignInManager<ApplicationUser>
+        {
+            public ApplicationSignInManager(ApplicationUserManager manager, IContextAccessor<HttpContext> contextAccessor)
+                : base(manager, contextAccessor)
+            {
+                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie;
+            }
+        }
+
+        public class NullLoggerFactory : ILoggerFactory
+        {
+            public ILogger Create(string name)
+            {
+                return new NullLogger();
+            }
+        }
+
+        public class NullLogger : ILogger
+        {
+            public bool WriteCore(TraceType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
+            {
+                return false;
+            }
+        }
+
     }
 }

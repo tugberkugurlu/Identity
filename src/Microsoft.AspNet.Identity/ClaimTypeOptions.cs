@@ -1,4 +1,7 @@
+using System;
+using System.ComponentModel;
 using System.Security.Claims;
+using Microsoft.AspNet.ConfigurationModel;
 
 namespace Microsoft.AspNet.Identity
 {
@@ -15,7 +18,11 @@ namespace Microsoft.AspNet.Identity
             SecurityStamp = DefaultSecurityStampClaimType;
             UserId = ClaimTypes.NameIdentifier;
             UserName = ClaimTypes.Name;
-            
+        }
+
+        public ClaimTypeOptions(IConfiguration config) : this()
+        {
+            IdentityOptions.Read(this, config);
         }
 
         /// <summary>

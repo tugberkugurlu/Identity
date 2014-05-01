@@ -1,3 +1,5 @@
+using Microsoft.AspNet.ConfigurationModel;
+
 namespace Microsoft.AspNet.Identity
 {
     public class PasswordOptions
@@ -9,6 +11,11 @@ namespace Microsoft.AspNet.Identity
             RequireNonLetterOrDigit = true;
             RequireUppercase = true;
             RequiredLength = 6;
+        }
+
+        public PasswordOptions(IConfiguration config) : this()
+        {
+            IdentityOptions.Read(this, config);
         }
 
         /// <summary>
