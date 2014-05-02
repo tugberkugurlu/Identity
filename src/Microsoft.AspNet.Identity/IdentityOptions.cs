@@ -73,6 +73,7 @@ namespace Microsoft.AspNet.Identity
 
         public LockoutOptions Lockout { get; set; }
 
+        // TODO: maybe make this internal as its only for tests
         public void Copy(IdentityOptions options)
         {
             if (options == null)
