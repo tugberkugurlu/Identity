@@ -1,0 +1,12 @@
+{
+    "version": "0.1-alpha-*",
+    "dependencies": {
+        "Microsoft.AspNet.Identity": "",
+        "System.Security.Claims" : "0.1-alpha-*",
+        "RavenDB.Client": "2.5.2879"
+    },
+    "configurations": {
+        "net45": {
+        }
+    }
+}
