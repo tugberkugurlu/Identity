@@ -2,18 +2,22 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.OptionsModel;
 
 namespace Microsoft.AspNet.Identity.Test
 {
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
-        public ApplicationUserManager(IServiceProvider services, IUserStore<ApplicationUser> store, IOptionsAccessor<IdentityOptions> options) : base(services, store, options) { }
+        public ApplicationUserManager(IUserStore<ApplicationUser> store, IOptionsAccessor<IdentityOptions> options,
+            IPasswordHasher passwordHasher, IUserValidator<ApplicationUser> userValidator,
+            IPasswordValidator<ApplicationUser> passwordValidator)
+            : base(store, options, passwordHasher, userValidator, passwordValidator) { }
     }
 
     public class ApplicationRoleManager : RoleManager<IdentityRole>
     {
-        public ApplicationRoleManager(IServiceProvider services, IRoleStore<IdentityRole> store) : base(services, store) { }
+        public ApplicationRoleManager(IRoleStore<IdentityRole> store, IRoleValidator<IdentityRole> roleValidator)
+            : base(store, roleValidator) { }
     }
 
     public class ApplicationUser : IdentityUser

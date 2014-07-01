@@ -1,19 +1,17 @@
 {
-  "version": "0.1-alpha-*",
   "dependencies": {
-    "Microsoft.AspNet.Http" : "0.1-alpha-*",
-    "Microsoft.AspNet.Identity" : "0.1-alpha-*",
-    "Microsoft.AspNet.Identity.InMemory" : "0.1-alpha-*",
-    "Microsoft.AspNet.PipelineCore" : "0.1-alpha-*",
-    "Microsoft.AspNet.RequestContainer" : "0.1-alpha-*",
-    "Microsoft.AspNet.Testing" : "0.1-alpha-*",
-    "Microsoft.Framework.ConfigurationModel": "0.1-alpha-*",
-    "Microsoft.Framework.DependencyInjection" : "0.1-alpha-*",
-    "xunit.abstractions": "2.0.0-aspnet-*",
-    "xunit.assert": "2.0.0-aspnet-*",
-    "xunit.core": "2.0.0-aspnet-*",
-    "xunit.execution": "2.0.0-aspnet-*",
-    "Xunit.KRunner": "0.1-alpha-*"
+    "Microsoft.AspNet.Http" : "1.0.0-*",
+    "Microsoft.AspNet.Identity" : "",
+    "Microsoft.AspNet.Identity.Authentication" : "",
+    "Microsoft.AspNet.PipelineCore" : "1.0.0-*",
+    "Microsoft.AspNet.RequestContainer" : "1.0.0-*",
+    "Microsoft.AspNet.Security" : "1.0.0-*",
+    "Microsoft.AspNet.Security.Cookies" : "1.0.0-*",
+    "Microsoft.AspNet.Testing" : "1.0.0-*",
+    "Microsoft.Framework.ConfigurationModel": "1.0.0-*",
+    "Microsoft.Framework.DependencyInjection" : "1.0.0-*",
+    "Microsoft.Framework.OptionsModel" : "1.0.0-*",
+    "Xunit.KRunner": "1.0.0-*"
   },
   "code": "**\\*.cs;..\\Shared\\*.cs",
   "configurations": {

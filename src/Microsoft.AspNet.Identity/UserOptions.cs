@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.Framework.ConfigurationModel;
-
 namespace Microsoft.AspNet.Identity
 {
     public class UserOptions
@@ -22,15 +20,5 @@ namespace Microsoft.AspNet.Identity
         ///     If set, enforces that emails are non empty, valid, and unique
         /// </summary>
         public bool RequireUniqueEmail { get; set; }
-
-        public virtual void Copy(UserOptions options)
-        {
-            if (options == null)
-            {
-                return;
-            }
-            AllowOnlyAlphanumericNames = options.AllowOnlyAlphanumericNames;
-            RequireUniqueEmail = options.RequireUniqueEmail;
-        }
     }
 }

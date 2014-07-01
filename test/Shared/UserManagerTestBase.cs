@@ -6,10 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity.Test;
 using Microsoft.AspNet.Testing;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.DependencyInjection.Fallback;
 using Xunit;
 
 namespace Microsoft.AspNet.Identity.Test
@@ -61,6 +58,19 @@ namespace Microsoft.AspNet.Identity.Test
             IdentityResultAssert.IsSuccess(await manager.SetUserNameAsync(user, "New"));
             Assert.NotNull(await manager.FindByNameAsync("New"));
             Assert.Null(await manager.FindByNameAsync("UpdateAsync"));
+        }
+
+        [Fact]
+        public async Task CanUpdatePasswordUsingHasher()
+        {
+            var manager = CreateManager();
+            var user = new TUser() { UserName = "UpdatePassword" };
+            IdentityResultAssert.IsSuccess(await manager.CreateAsync(user, "password"));
+            Assert.True(await manager.CheckPasswordAsync(user, "password"));
+            user.PasswordHash = manager.PasswordHasher.HashPassword("New");
+            IdentityResultAssert.IsSuccess(await manager.UpdateAsync(user));
+            Assert.False(await manager.CheckPasswordAsync(user, "password"));
+            Assert.True(await manager.CheckPasswordAsync(user, "New"));
         }
 
         [Fact]
@@ -399,9 +409,8 @@ namespace Microsoft.AspNet.Identity.Test
                 IdentityResultAssert.IsSuccess(await manager.AddClaimAsync(user, c));
             }
 
-            var identity = await manager.CreateIdentityAsync(user, "test");
-            var claimsFactory = (ClaimsIdentityFactory<TUser>)manager.ClaimsIdentityFactory;
-            Assert.NotNull(claimsFactory);
+            var claimsFactory = new ClaimsIdentityFactory<TUser, TRole>(manager, role);
+            var identity = await claimsFactory.CreateAsync(user, "test");
             var claims = identity.Claims.ToList();
             Assert.NotNull(claims);
             Assert.True(
@@ -468,7 +477,7 @@ namespace Microsoft.AspNet.Identity.Test
             Assert.NotNull(stamp);
             var token = await manager.GeneratePasswordResetTokenAsync(user);
             Assert.NotNull(token);
-            IdentityResultAssert.IsSuccess(await manager.ResetPassword(user, token, newPassword));
+            IdentityResultAssert.IsSuccess(await manager.ResetPasswordAsync(user, token, newPassword));
             Assert.Null(await manager.FindByUserNamePasswordAsync(user.UserName, password));
             Assert.Equal(user, await manager.FindByUserNamePasswordAsync(user.UserName, newPassword));
             Assert.NotEqual(stamp, user.SecurityStamp);
@@ -488,7 +497,7 @@ namespace Microsoft.AspNet.Identity.Test
             var token = await manager.GeneratePasswordResetTokenAsync(user);
             Assert.NotNull(token);
             manager.PasswordValidator = new AlwaysBadValidator();
-            IdentityResultAssert.IsFailure(await manager.ResetPassword(user, token, newPassword),
+            IdentityResultAssert.IsFailure(await manager.ResetPasswordAsync(user, token, newPassword),
                 AlwaysBadValidator.ErrorMessage);
             Assert.NotNull(await manager.FindByUserNamePasswordAsync(user.UserName, password));
             Assert.Equal(user, await manager.FindByUserNamePasswordAsync(user.UserName, password));
@@ -506,7 +515,7 @@ namespace Microsoft.AspNet.Identity.Test
             IdentityResultAssert.IsSuccess(await manager.CreateAsync(user, password));
             var stamp = user.SecurityStamp;
             Assert.NotNull(stamp);
-            IdentityResultAssert.IsFailure(await manager.ResetPassword(user, "bogus", newPassword), "Invalid token.");
+            IdentityResultAssert.IsFailure(await manager.ResetPasswordAsync(user, "bogus", newPassword), "Invalid token.");
             Assert.NotNull(await manager.FindByUserNamePasswordAsync(user.UserName, password));
             Assert.Equal(user, await manager.FindByUserNamePasswordAsync(user.UserName, password));
             Assert.Equal(stamp, user.SecurityStamp);
@@ -808,6 +817,30 @@ namespace Microsoft.AspNet.Identity.Test
         }
 
         [Fact]
+        public async Task CanAddRemoveRoleClaim()
+        {
+            var manager = CreateRoleManager();
+            var role = CreateRole("ClaimsAddRemove");
+            IdentityResultAssert.IsSuccess(await manager.CreateAsync(role));
+            Claim[] claims = { new Claim("c", "v"), new Claim("c2", "v2"), new Claim("c2", "v3") };
+            foreach (Claim c in claims)
+            {
+                IdentityResultAssert.IsSuccess(await manager.AddClaimAsync(role, c));
+            }
+            var roleClaims = await manager.GetClaimsAsync(role);
+            Assert.Equal(3, roleClaims.Count);
+            IdentityResultAssert.IsSuccess(await manager.RemoveClaimAsync(role, claims[0]));
+            roleClaims = await manager.GetClaimsAsync(role);
+            Assert.Equal(2, roleClaims.Count);
+            IdentityResultAssert.IsSuccess(await manager.RemoveClaimAsync(role, claims[1]));
+            roleClaims = await manager.GetClaimsAsync(role);
+            Assert.Equal(1, roleClaims.Count);
+            IdentityResultAssert.IsSuccess(await manager.RemoveClaimAsync(role, claims[2]));
+            roleClaims = await manager.GetClaimsAsync(role);
+            Assert.Equal(0, roleClaims.Count);
+        }
+
+        [Fact]
         public async Task CanRoleFindByIdTest()
         {
             var manager = CreateRoleManager();
@@ -969,7 +1002,6 @@ namespace Microsoft.AspNet.Identity.Test
                 }
             }
         }
-
 
         [Fact]
         public async Task RemoveUserFromRoleWithMultipleRoles()
@@ -1444,22 +1476,6 @@ namespace Microsoft.AspNet.Identity.Test
             var user = new TUser() { UserName = "PhoneCodeTest", PhoneNumber = "4251234567" };
             IdentityResultAssert.IsSuccess(await manager.CreateAsync(user));
             Assert.False(await manager.VerifyTwoFactorTokenAsync(user, factorId, "bogus"));
-        }
-
-        public class TestSetup : IOptionsSetup<IdentityOptions>
-        {
-            private readonly IdentityOptions _options;
-
-            public TestSetup(IdentityOptions options)
-            {
-                _options = options;
-            }
-
-            public int Order { get { return 0; } }
-            public void Setup(IdentityOptions options)
-            {
-                options.Copy(_options);
-            }
         }
     }
 }

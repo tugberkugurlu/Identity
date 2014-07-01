@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.ComponentModel;
 using System.Security.Claims;
-using Microsoft.Framework.ConfigurationModel;
 
 namespace Microsoft.AspNet.Identity
 {
@@ -42,17 +39,5 @@ namespace Microsoft.AspNet.Identity
         ///     Claim type used for the user security stamp
         /// </summary>
         public string SecurityStamp { get; set; }
-
-        public virtual void Copy(ClaimTypeOptions options)
-        {
-            if (options == null)
-            {
-                return;
-            }
-            Role = options.Role;
-            SecurityStamp = options.SecurityStamp;
-            UserId = options.UserId;
-            UserName = options.UserName;
-        }
     }
 }
