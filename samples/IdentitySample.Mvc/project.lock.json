@@ -3,13 +3,24 @@
   "version": 2,
   "targets": {
     "DNX,Version=v4.5.2": {
-      "Dnx.Identity.MongoDB/1.0.0": {
-        "type": "project",
-        "framework": "DNX,Version=v4.5.2",
+      "Dnx.Identity.MongoDB/3.0.0-beta8-001": {
+        "type": "package",
         "dependencies": {
           "Microsoft.AspNet.Identity": "3.0.0-beta8",
           "Microsoft.Framework.Logging": "1.0.0-beta8",
           "MongoDB.Driver": "2.0.1"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx452/Dnx.Identity.MongoDB.dll": {}
+        },
+        "runtime": {
+          "lib/dnx452/Dnx.Identity.MongoDB.dll": {}
         }
       },
       "Microsoft.AspNet.Antiforgery/1.0.0-beta8": {
@@ -1653,13 +1664,24 @@
       }
     },
     "DNX,Version=v4.5.2/win7-x86": {
-      "Dnx.Identity.MongoDB/1.0.0": {
-        "type": "project",
-        "framework": "DNX,Version=v4.5.2",
+      "Dnx.Identity.MongoDB/3.0.0-beta8-001": {
+        "type": "package",
         "dependencies": {
           "Microsoft.AspNet.Identity": "3.0.0-beta8",
           "Microsoft.Framework.Logging": "1.0.0-beta8",
           "MongoDB.Driver": "2.0.1"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx452/Dnx.Identity.MongoDB.dll": {}
+        },
+        "runtime": {
+          "lib/dnx452/Dnx.Identity.MongoDB.dll": {}
         }
       },
       "Microsoft.AspNet.Antiforgery/1.0.0-beta8": {
@@ -3303,13 +3325,24 @@
       }
     },
     "DNX,Version=v4.5.2/win7-x64": {
-      "Dnx.Identity.MongoDB/1.0.0": {
-        "type": "project",
-        "framework": "DNX,Version=v4.5.2",
+      "Dnx.Identity.MongoDB/3.0.0-beta8-001": {
+        "type": "package",
         "dependencies": {
           "Microsoft.AspNet.Identity": "3.0.0-beta8",
           "Microsoft.Framework.Logging": "1.0.0-beta8",
           "MongoDB.Driver": "2.0.1"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx452/Dnx.Identity.MongoDB.dll": {}
+        },
+        "runtime": {
+          "lib/dnx452/Dnx.Identity.MongoDB.dll": {}
         }
       },
       "Microsoft.AspNet.Antiforgery/1.0.0-beta8": {
@@ -4954,13 +4987,20 @@
     }
   },
   "libraries": {
-    "Dnx.Identity.MongoDB/1.0.0": {
-      "type": "project",
-      "path": "../../../ModernShopping/Auth/src/Dnx.Identity.MongoDB/project.json"
-    },
     "Microsoft.AspNet.Identity/3.0.0-beta8": {
       "type": "project",
       "path": "../../src/Microsoft.AspNet.Identity/project.json"
+    },
+    "Dnx.Identity.MongoDB/3.0.0-beta8-001": {
+      "type": "package",
+      "sha512": "oMmudN0mwUY0lMa1rpRoLUO13ZmandULI/atGIxHehVma2emsMB8Z9WjKGKbBkMiQdbSsSRRwPB+hAIFqhuMXg==",
+      "files": [
+        "Dnx.Identity.MongoDB.3.0.0-beta8-001.nupkg",
+        "Dnx.Identity.MongoDB.3.0.0-beta8-001.nupkg.sha512",
+        "Dnx.Identity.MongoDB.nuspec",
+        "lib/dnx452/Dnx.Identity.MongoDB.dll",
+        "lib/dnx452/Dnx.Identity.MongoDB.xml"
+      ]
     },
     "Microsoft.AspNet.Antiforgery/1.0.0-beta8": {
       "type": "package",
@@ -6433,7 +6473,7 @@
     ],
     "DNX,Version=v4.5.2": [
       "Microsoft.Framework.Logging.NLog >= 1.0.0-beta8",
-      "Dnx.Identity.MongoDB "
+      "Dnx.Identity.MongoDB >= 3.0.0-beta8-001"
     ]
   }
 }

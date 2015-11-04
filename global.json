@@ -1,4 +1,4 @@
 {
-  "projects": [ "src", "../ModernShopping/Auth/src" ],
+  "projects": [ "src" ],
   "sdk": { "version": "1.0.0-beta8" }
 }
