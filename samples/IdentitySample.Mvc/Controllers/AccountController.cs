@@ -7,21 +7,22 @@ using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
+using Dnx.Identity.MongoDB;
 
 namespace IdentitySample.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<MongoIdentityUser> userManager, SignInManager<MongoIdentityUser> signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
 
-        public UserManager<ApplicationUser> UserManager { get; private set; }
+        public UserManager<MongoIdentityUser> UserManager { get; private set; }
 
-        public SignInManager<ApplicationUser> SignInManager { get; private set; }
+        public SignInManager<MongoIdentityUser> SignInManager { get; private set; }
 
         //
         // GET: /Account/Login
@@ -86,7 +87,7 @@ namespace IdentitySample.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new MongoIdentityUser(model.Email, model.Email);
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -185,7 +186,8 @@ namespace IdentitySample.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+
+                var user = new MongoIdentityUser(model.Email, model.Email);
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -422,7 +424,7 @@ namespace IdentitySample.Controllers
             }
         }
 
-        private async Task<ApplicationUser> GetCurrentUserAsync()
+        private async Task<MongoIdentityUser> GetCurrentUserAsync()
         {
             return await UserManager.FindByIdAsync(HttpContext.User.GetUserId());
         }

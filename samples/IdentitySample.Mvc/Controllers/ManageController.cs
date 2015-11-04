@@ -6,21 +6,22 @@ using IdentitySamples;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using Dnx.Identity.MongoDB;
 
 namespace IdentitySample.Controllers
 {
     [Authorize]
     public class ManageController : Controller
     {
-        public ManageController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public ManageController(UserManager<MongoIdentityUser> userManager, SignInManager<MongoIdentityUser> signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
 
-        public UserManager<ApplicationUser> UserManager { get; private set; }
+        public UserManager<MongoIdentityUser> UserManager { get; private set; }
 
-        public SignInManager<ApplicationUser> SignInManager { get; private set; }
+        public SignInManager<MongoIdentityUser> SignInManager { get; private set; }
 
         //
         // GET: /Account/Index
@@ -368,7 +369,7 @@ namespace IdentitySample.Controllers
             Error
         }
 
-        private async Task<ApplicationUser> GetCurrentUserAsync()
+        private async Task<MongoIdentityUser> GetCurrentUserAsync()
         {
             return await UserManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
