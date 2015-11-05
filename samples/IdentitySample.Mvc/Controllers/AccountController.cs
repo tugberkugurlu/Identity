@@ -60,10 +60,13 @@ namespace IdentitySample.Controllers
                 }
                 else
                 {
+                    ViewBag.LoginProviders = SignInManager.GetExternalAuthenticationSchemes().ToList();
                     ModelState.AddModelError("", "Invalid username or password.");
                     return View(model);
                 }
             }
+
+            ViewBag.LoginProviders = SignInManager.GetExternalAuthenticationSchemes().ToList();
 
             // If we got this far, something failed, redisplay form
             return View(model);
