@@ -45,7 +45,7 @@ namespace IdentitySample.Controllers
             ViewBag.ReturnUrl = returnUrl;
             if (ModelState.IsValid)
             {
-                var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     return RedirectToLocal(returnUrl);
@@ -67,7 +67,6 @@ namespace IdentitySample.Controllers
             }
 
             ViewBag.LoginProviders = SignInManager.GetExternalAuthenticationSchemes().ToList();
-
             // If we got this far, something failed, redisplay form
             return View(model);
         }

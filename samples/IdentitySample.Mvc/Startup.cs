@@ -54,6 +54,11 @@ namespace IdentitySamples
                 options.SignInScheme = new IdentityCookieOptions().ExternalCookieAuthenticationScheme;
             });
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Lockout.AllowedForNewUsers = true;
+            });
+
             // Identity services
             services.TryAddSingleton<IdentityMarkerService>();
             services.TryAddScoped<IUserValidator<MongoIdentityUser>, UserValidator<MongoIdentityUser>>();

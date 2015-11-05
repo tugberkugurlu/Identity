@@ -30,7 +30,7 @@
         "dnx452": {
             "dependencies": {
               "Microsoft.Framework.Logging.NLog": "1.0.0-beta8",
-              "Dnx.Identity.MongoDB": "3.0.0-beta8-001"
+              "Dnx.Identity.MongoDB": "3.0.0-beta8-002"
             }
         }
     }
