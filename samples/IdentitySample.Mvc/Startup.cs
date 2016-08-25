@@ -2,11 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using IdentitySample.Models;
 using IdentitySample.Services;
 using Microsoft.AspNetCore.Identity;
 using System.IO;
@@ -96,26 +94,15 @@ namespace IdentitySample
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-
-                // For more details on creating database during deployment see http://go.microsoft.com/fwlink/?LinkID=615859
-                try
-                {
-                    using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                        .CreateScope())
-                    {
-                        serviceScope.ServiceProvider.GetService<ApplicationDbContext>()
-                             .Database.Migrate();
-                    }
-                }
-                catch { }
             }
             app.UseStaticFiles();
 
+            // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
+            
             app.UseIdentity()
                .UseFacebookAuthentication(new FacebookOptions
                {
@@ -132,7 +119,6 @@ namespace IdentitySample
                     ConsumerKey = "BSdJJ0CrDuvEhpkchnukXZBUv",
                     ConsumerSecret = "xKUNuKhsRdHD03eLn67xhPAyE1wFFEndFo1X2UJaK2m1jdAxf4"
                 });
-            // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 
             app.UseMvc(routes =>
             {
