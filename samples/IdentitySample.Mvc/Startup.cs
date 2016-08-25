@@ -13,6 +13,8 @@ using System.Security.Claims;
 using MongoDB.Driver;
 using Dnx.Identity.MongoDB;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace IdentitySample
 {
@@ -24,6 +26,8 @@ namespace IdentitySample
 
     public class Startup
     {
+        private readonly IHostingEnvironment _env;
+
         public Startup(IHostingEnvironment env)
         {
             // Set up configuration sources.
@@ -40,11 +44,14 @@ namespace IdentitySample
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+            _env = env;
         }
 
         public IConfigurationRoot Configuration { get; set; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// see: https://github.com/aspnet/Identity/blob/79dbed5a924e96a22b23ae6c84731e0ac806c2b5/src/Microsoft.AspNetCore.Identity/IdentityServiceCollectionExtensions.cs#L46-L68
+        /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDb"));
@@ -60,11 +67,25 @@ namespace IdentitySample
 
             services.Configure<IdentityOptions>(options =>
             {
+                var dataProtectionPath = Path.Combine(_env.WebRootPath, "identity-artifacts");
+                options.Cookies.ApplicationCookie.AuthenticationScheme = "ApplicationCookie";
+                options.Cookies.ApplicationCookie.DataProtectionProvider = DataProtectionProvider.Create(dataProtectionPath);
                 options.Lockout.AllowedForNewUsers = true;
             });
 
+            // Services used by identity
+            services.AddAuthentication(options =>
+            {
+                // This is the Default value for ExternalCookieAuthenticationScheme
+                options.SignInScheme = new IdentityCookieOptions().ExternalCookieAuthenticationScheme;
+            });
+
+            // Hosting doesn't add IHttpContextAccessor by default
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddOptions();
             services.AddDataProtection();
+
             services.TryAddSingleton<IdentityMarkerService>();
             services.TryAddSingleton<IUserValidator<MongoIdentityUser>, UserValidator<MongoIdentityUser>>();
             services.TryAddSingleton<IPasswordValidator<MongoIdentityUser>, PasswordValidator<MongoIdentityUser>>();
@@ -102,7 +123,7 @@ namespace IdentitySample
             app.UseStaticFiles();
 
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
-            
+
             app.UseIdentity()
                .UseFacebookAuthentication(new FacebookOptions
                {
